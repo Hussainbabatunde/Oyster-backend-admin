@@ -2,8 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const productController_1 = require("../controllers/productController");
+const upload_1 = require("../middlewares/upload");
+const uploadController_1 = require("../controllers/uploadController");
 const router = (0, express_1.Router)();
 router.get('/', productController_1.ProductController.getAll);
+router.post('/upload', upload_1.uploadProductImages, uploadController_1.UploadController.uploadImages);
 router.get('/:id', productController_1.ProductController.getById);
 router.post('/', productController_1.ProductController.create);
 router.put('/:id', productController_1.ProductController.update);

@@ -87,12 +87,14 @@ class ProductService {
             data.inStock = Boolean(payload.in_stock);
         if (payload.stock_count !== undefined)
             data.stockCount = parseInt(payload.stock_count);
-        if (payload.rating !== undefined)
-            data.rating = new client_1.Prisma.Decimal(payload.rating);
         if (payload.image !== undefined)
             data.image = payload.image;
-        if (payload.images !== undefined)
+        if (payload.images !== undefined) {
             data.images = payload.images;
+            if (!payload.image && payload.images.length > 0) {
+                data.image = payload.images[0];
+            }
+        }
         if (payload.specifications !== undefined)
             data.specifications = payload.specifications;
         return prisma_1.prisma.product.update({
