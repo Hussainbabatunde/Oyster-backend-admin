@@ -49,6 +49,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/upload', uploadRoutes);
 
+
 // Root Route
 app.get('/', (req, res) => {
   res.json({
