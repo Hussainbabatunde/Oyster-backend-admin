@@ -4,27 +4,34 @@ import { Prisma } from '@prisma/client';
 
 export class ProductService {
   static async getAllProducts(category?: string, search?: string) {
-    const where: Prisma.ProductWhereInput = {};
+    const andConditions: Prisma.ProductWhereInput[] = [];
 
     if (category) {
       const catId = parseInt(category);
       if (!isNaN(catId)) {
-        where.OR = [
-          { categoryId: catId },
-          { categoryName: { equals: category, mode: 'insensitive' } },
-        ];
+        andConditions.push({
+          OR: [
+            { categoryId: catId },
+            { categoryName: { equals: category, mode: 'insensitive' } },
+          ],
+        });
       } else {
-        where.categoryName = { equals: category, mode: 'insensitive' };
+        andConditions.push({ categoryName: { equals: category, mode: 'insensitive' } });
       }
     }
 
-    if (search) {
-      where.OR = [
-        ...(where.OR || []),
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ];
+    if (search && search.trim()) {
+      const searchTerm = search.trim();
+      andConditions.push({
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+          { certificateNumber: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      });
     }
+
+    const where: Prisma.ProductWhereInput = andConditions.length > 0 ? { AND: andConditions } : {};
 
     return prisma.product.findMany({
       where,
@@ -51,7 +58,7 @@ export class ProductService {
       data: {
         name: payload.name,
         nickname: payload.nickname || '',
-        categoryId: payload.category_id || null,
+        category: payload.category_id ? { connect: { id: payload.category_id } } : undefined,
         categoryName: payload.category_name || 'General',
         price: new Prisma.Decimal(parsedPrice),
         originalPrice: new Prisma.Decimal(parsedOrigPrice),
@@ -64,6 +71,7 @@ export class ProductService {
         image: payload.image || imgList[0],
         images: imgList as any,
         specifications: specs as any,
+        certificateNumber: payload.certificate_number || payload.certificateNumber || '',
       },
     });
   }
@@ -90,6 +98,8 @@ export class ProductService {
       }
     }
     if (payload.specifications !== undefined) data.specifications = payload.specifications as any;
+    const certNo = payload.certificate_number ?? payload.certificateNumber;
+    if (certNo !== undefined) data.certificateNumber = certNo;
 
     return prisma.product.update({
       where: { id },

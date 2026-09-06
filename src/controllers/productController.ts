@@ -28,9 +28,10 @@ export class ProductController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, price } = req.body;
-      if (!name || price === undefined) {
-        return res.status(400).json({ success: false, message: 'Product name and price are required' });
+      const { name, price, certificateNumber, certificate_number } = req.body;
+      const certNo = certificateNumber || certificate_number;
+      if (!name || price === undefined || !certNo || !String(certNo).trim()) {
+        return res.status(400).json({ success: false, message: 'Product name, price, and certificate number are required' });
       }
 
       const product = await ProductService.createProduct(req.body);

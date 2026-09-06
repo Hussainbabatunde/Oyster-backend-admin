@@ -38,6 +38,7 @@ model Product {
   image          String?   @db.Text
   images         Json?     @default("[]")
   specifications Json?     @default("[]")
+  certificateNumber String @default("") @map("certificate_number") @db.VarChar(255)
   createdAt      DateTime  @default(now()) @map("created_at")
 
   category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)

@@ -28,4 +28,6 @@ export interface ProductPayload {
   image?: string;
   images?: string[];
   specifications?: Array<{ title: string; description: string }>;
+  certificate_number?: string;
+  certificateNumber?: string;
 }
