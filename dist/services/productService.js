@@ -5,26 +5,32 @@ const prisma_1 = require("../config/prisma");
 const client_1 = require("@prisma/client");
 class ProductService {
     static async getAllProducts(category, search) {
-        const where = {};
+        const andConditions = [];
         if (category) {
             const catId = parseInt(category);
             if (!isNaN(catId)) {
-                where.OR = [
-                    { categoryId: catId },
-                    { categoryName: { equals: category, mode: 'insensitive' } },
-                ];
+                andConditions.push({
+                    OR: [
+                        { categoryId: catId },
+                        { categoryName: { equals: category, mode: 'insensitive' } },
+                    ],
+                });
             }
             else {
-                where.categoryName = { equals: category, mode: 'insensitive' };
+                andConditions.push({ categoryName: { equals: category, mode: 'insensitive' } });
             }
         }
-        if (search) {
-            where.OR = [
-                ...(where.OR || []),
-                { name: { contains: search, mode: 'insensitive' } },
-                { description: { contains: search, mode: 'insensitive' } },
-            ];
+        if (search && search.trim()) {
+            const searchTerm = search.trim();
+            andConditions.push({
+                OR: [
+                    { name: { contains: searchTerm, mode: 'insensitive' } },
+                    { description: { contains: searchTerm, mode: 'insensitive' } },
+                    { certificateNumber: { contains: searchTerm, mode: 'insensitive' } },
+                ],
+            });
         }
+        const where = andConditions.length > 0 ? { AND: andConditions } : {};
         return prisma_1.prisma.product.findMany({
             where,
             orderBy: { id: 'desc' },
@@ -47,7 +53,7 @@ class ProductService {
             data: {
                 name: payload.name,
                 nickname: payload.nickname || '',
-                categoryId: payload.category_id || null,
+                category: payload.category_id ? { connect: { id: payload.category_id } } : undefined,
                 categoryName: payload.category_name || 'General',
                 price: new client_1.Prisma.Decimal(parsedPrice),
                 originalPrice: new client_1.Prisma.Decimal(parsedOrigPrice),
@@ -60,6 +66,7 @@ class ProductService {
                 image: payload.image || imgList[0],
                 images: imgList,
                 specifications: specs,
+                certificateNumber: payload.certificate_number || payload.certificateNumber || '',
             },
         });
     }
@@ -97,6 +104,9 @@ class ProductService {
         }
         if (payload.specifications !== undefined)
             data.specifications = payload.specifications;
+        const certNo = payload.certificate_number ?? payload.certificateNumber;
+        if (certNo !== undefined)
+            data.certificateNumber = certNo;
         return prisma_1.prisma.product.update({
             where: { id },
             data,

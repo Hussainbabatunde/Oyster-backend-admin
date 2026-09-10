@@ -9,6 +9,19 @@ const prisma_1 = require("./config/prisma");
 const client_1 = require("@prisma/client");
 const DATA_FILE = path_1.default.join(__dirname, '../data.json');
 const defaultSeed = {
+    sub_categories: [
+        { id: 1, category_id: 1, name: 'iPhones', slug: 'iphones' },
+        { id: 2, category_id: 1, name: 'Android Phones', slug: 'android-phones' },
+        { id: 3, category_id: 1, name: 'Refurbished', slug: 'refurbished' },
+        { id: 4, category_id: 2, name: 'Fast Charging', slug: 'fast-charging' },
+        { id: 5, category_id: 2, name: 'MagSafe & Wireless', slug: 'magsafe-wireless' },
+        { id: 6, category_id: 2, name: 'High Capacity', slug: 'high-capacity' },
+        { id: 7, category_id: 3, name: 'MacBooks', slug: 'macbooks' },
+        { id: 8, category_id: 3, name: 'Gaming Laptops', slug: 'gaming-laptops' },
+        { id: 9, category_id: 3, name: 'Ultrabooks', slug: 'ultrabooks' },
+        { id: 10, category_id: 4, name: 'Apple Watch', slug: 'apple-watch' },
+        { id: 11, category_id: 4, name: 'Fitness Trackers', slug: 'fitness-trackers' }
+    ],
     categories: [
         { id: 1, name: 'Phone', slug: 'phone', description: 'Smartphones & Mobile Devices' },
         { id: 2, name: 'Power Bank', slug: 'power-bank', description: 'Portable Power & Chargers' },
@@ -103,65 +116,133 @@ async function seed() {
         catch (e) { }
     }
     // 1. Seed Categories
+    const catIdMap = new Map();
+    let nextCatId = 5;
     for (const cat of data.categories) {
-        await prisma_1.prisma.category.upsert({
-            where: { id: cat.id },
-            update: {
-                name: cat.name,
-                slug: cat.slug,
-                description: cat.description,
-            },
-            create: {
-                id: cat.id,
-                name: cat.name,
-                slug: cat.slug,
-                description: cat.description,
-            },
+        let targetId = cat.id;
+        if (targetId > 2147483647) {
+            targetId = nextCatId++;
+        }
+        catIdMap.set(cat.id, targetId);
+        const existingCat = await prisma_1.prisma.category.findFirst({
+            where: { OR: [{ id: targetId }, { name: cat.name }] },
         });
+        if (existingCat) {
+            await prisma_1.prisma.category.update({
+                where: { id: existingCat.id },
+                data: {
+                    name: cat.name,
+                    slug: cat.slug,
+                    description: cat.description,
+                },
+            });
+            catIdMap.set(cat.id, existingCat.id);
+        }
+        else {
+            const created = await prisma_1.prisma.category.create({
+                data: {
+                    name: cat.name,
+                    slug: cat.slug,
+                    description: cat.description,
+                },
+            });
+            catIdMap.set(cat.id, created.id);
+        }
     }
-    // 2. Seed Products
-    for (const prod of data.products) {
-        const imgList = (prod.images && prod.images.length) ? prod.images : [prod.image || '/images/product-item1.jpg'];
-        await prisma_1.prisma.product.upsert({
-            where: { id: prod.id },
-            update: {
-                name: prod.name,
-                nickname: prod.nickname || '',
-                categoryId: prod.category_id || null,
-                categoryName: prod.category_name || 'General',
-                price: new client_1.Prisma.Decimal(prod.price),
-                originalPrice: new client_1.Prisma.Decimal(prod.original_price ?? prod.price),
-                description: prod.description || '',
-                size: prod.size || '',
-                color: prod.color || '',
-                inStock: prod.in_stock ?? true,
-                stockCount: prod.stock_count ?? 10,
-                rating: new client_1.Prisma.Decimal(prod.rating ?? 5.0),
-                reviewsCount: prod.reviews_count ?? 1,
-                image: prod.image || imgList[0],
-                images: imgList,
-                specifications: (prod.specifications || []),
-            },
-            create: {
-                id: prod.id,
-                name: prod.name,
-                nickname: prod.nickname || '',
-                categoryId: prod.category_id || null,
-                categoryName: prod.category_name || 'General',
-                price: new client_1.Prisma.Decimal(prod.price),
-                originalPrice: new client_1.Prisma.Decimal(prod.original_price ?? prod.price),
-                description: prod.description || '',
-                size: prod.size || '',
-                color: prod.color || '',
-                inStock: prod.in_stock ?? true,
-                stockCount: prod.stock_count ?? 10,
-                rating: new client_1.Prisma.Decimal(prod.rating ?? 5.0),
-                reviewsCount: prod.reviews_count ?? 1,
-                image: prod.image || imgList[0],
-                images: imgList,
-                specifications: (prod.specifications || []),
-            },
+    // 2. Seed Subcategories
+    const subCatsToSeed = data.sub_categories || defaultSeed.sub_categories;
+    let nextSubId = 12;
+    for (const sub of subCatsToSeed) {
+        let targetId = sub.id;
+        if (targetId > 2147483647) {
+            targetId = nextSubId++;
+        }
+        const rawCatId = sub.category_id || sub.categoryId;
+        const parentCatId = catIdMap.get(rawCatId) || (rawCatId <= 2147483647 ? rawCatId : null);
+        if (!parentCatId)
+            continue;
+        const parentCatExists = await prisma_1.prisma.category.findUnique({ where: { id: parentCatId } });
+        if (!parentCatExists)
+            continue;
+        const existingSub = await prisma_1.prisma.subCategory.findFirst({
+            where: { categoryId: parentCatId, name: sub.name }
         });
+        if (existingSub) {
+            await prisma_1.prisma.subCategory.update({
+                where: { id: existingSub.id },
+                data: {
+                    name: sub.name,
+                    slug: sub.slug || sub.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                }
+            });
+        }
+        else {
+            await prisma_1.prisma.subCategory.create({
+                data: {
+                    categoryId: parentCatId,
+                    name: sub.name,
+                    slug: sub.slug || sub.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                }
+            });
+        }
+    }
+    // 3. Seed Products
+    let nextProdId = 10;
+    for (const prod of data.products) {
+        let targetId = prod.id;
+        if (targetId > 2147483647) {
+            targetId = nextProdId++;
+        }
+        const imgList = (prod.images && prod.images.length) ? prod.images : [prod.image || '/images/product-item1.jpg'];
+        const catId = prod.category_id ? (catIdMap.get(prod.category_id) || (prod.category_id <= 2147483647 ? prod.category_id : null)) : null;
+        const existingProd = await prisma_1.prisma.product.findFirst({
+            where: { OR: [{ id: targetId }, { name: prod.name }] }
+        });
+        if (existingProd) {
+            await prisma_1.prisma.product.update({
+                where: { id: existingProd.id },
+                data: {
+                    name: prod.name,
+                    nickname: prod.nickname || '',
+                    categoryId: catId,
+                    categoryName: prod.category_name || 'General',
+                    price: new client_1.Prisma.Decimal(prod.price),
+                    originalPrice: new client_1.Prisma.Decimal(prod.original_price ?? prod.price),
+                    description: prod.description || '',
+                    size: prod.size || '',
+                    color: prod.color || '',
+                    inStock: prod.in_stock ?? true,
+                    stockCount: prod.stock_count ?? 10,
+                    rating: new client_1.Prisma.Decimal(prod.rating ?? 5.0),
+                    reviewsCount: prod.reviews_count ?? 1,
+                    image: prod.image || imgList[0],
+                    images: imgList,
+                    specifications: (prod.specifications || []),
+                },
+            });
+        }
+        else {
+            await prisma_1.prisma.product.create({
+                data: {
+                    name: prod.name,
+                    nickname: prod.nickname || '',
+                    categoryId: catId,
+                    categoryName: prod.category_name || 'General',
+                    price: new client_1.Prisma.Decimal(prod.price),
+                    originalPrice: new client_1.Prisma.Decimal(prod.original_price ?? prod.price),
+                    description: prod.description || '',
+                    size: prod.size || '',
+                    color: prod.color || '',
+                    inStock: prod.in_stock ?? true,
+                    stockCount: prod.stock_count ?? 10,
+                    rating: new client_1.Prisma.Decimal(prod.rating ?? 5.0),
+                    reviewsCount: prod.reviews_count ?? 1,
+                    image: prod.image || imgList[0],
+                    images: imgList,
+                    specifications: (prod.specifications || []),
+                },
+            });
+        }
     }
     // 3. Seed Admin Users
     for (const user of data.admin_users) {

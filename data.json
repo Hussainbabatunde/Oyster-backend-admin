@@ -19,13 +19,48 @@
       "description": "High-Performance Laptops & Notebooks"
     },
     {
-      "id": 4,
-      "name": "Smart Watches",
-      "slug": "smart-watches",
-      "description": "Fitness Trackers & Wearables"
+      "id": 1789039975465,
+      "name": "Smart Cameras",
+      "slug": "smart-cameras",
+      "description": "Security Cameras"
+    },
+    {
+      "id": 1789040102299,
+      "name": "Flit",
+      "slug": "flit",
+      "description": "a flit category"
+    },
+    {
+      "id": 1789040421567,
+      "name": "Gaming Consoles",
+      "slug": "gaming-consoles",
+      "description": "Next-gen gaming systems and controllers"
     }
   ],
   "products": [
+    {
+      "id": 1789039315279,
+      "name": "PlayStation 5 Slim",
+      "nickname": "",
+      "category_id": 1789039312178,
+      "category_name": "Gaming Consoles",
+      "subcategory_id": null,
+      "subcategory_name": "PlayStation",
+      "price": 499.99,
+      "original_price": 499.99,
+      "description": "",
+      "size": "",
+      "color": "",
+      "in_stock": true,
+      "stock_count": 10,
+      "rating": 5,
+      "reviews_count": 1,
+      "image": "/images/product-item1.jpg",
+      "images": [
+        "/images/product-item1.jpg"
+      ],
+      "specifications": []
+    },
     {
       "id": 1,
       "name": "iPhone 15 Pro Max",
@@ -58,7 +93,9 @@
           "title": "Battery",
           "description": "Up to 29 hours video playback"
         }
-      ]
+      ],
+      "subcategory_id": 1,
+      "subcategory_name": "iPhones"
     },
     {
       "id": 2,
@@ -96,7 +133,9 @@
           "title": "Display",
           "description": "Smart Color LCD Screen"
         }
-      ]
+      ],
+      "subcategory_id": 1,
+      "subcategory_name": "Fast Charging"
     },
     {
       "id": 3,
@@ -134,7 +173,9 @@
           "title": "Screen",
           "description": "16.2-inch Liquid Retina XDR (3456 x 2234)"
         }
-      ]
+      ],
+      "subcategory_id": 1,
+      "subcategory_name": "MacBooks"
     }
   ],
   "admin_users": [
@@ -144,6 +185,116 @@
       "password_hash": "$2a$10$wT8f6sFm.W69eD9O.M4NneCqZcQk4B3uL1r9x7g7h8i9j0k1l2m3n",
       "reset_token": null,
       "reset_token_expires": null
+    }
+  ],
+  "sub_categories": [
+    {
+      "id": 1,
+      "category_id": 1,
+      "name": "iPhones",
+      "slug": "iphones"
+    },
+    {
+      "id": 2,
+      "category_id": 1,
+      "name": "Android Phones",
+      "slug": "android-phones"
+    },
+    {
+      "id": 3,
+      "category_id": 1,
+      "name": "Refurbished",
+      "slug": "refurbished"
+    },
+    {
+      "id": 4,
+      "category_id": 2,
+      "name": "Fast Charging",
+      "slug": "fast-charging"
+    },
+    {
+      "id": 5,
+      "category_id": 2,
+      "name": "MagSafe & Wireless",
+      "slug": "magsafe-wireless"
+    },
+    {
+      "id": 6,
+      "category_id": 2,
+      "name": "High Capacity",
+      "slug": "high-capacity"
+    },
+    {
+      "id": 7,
+      "category_id": 3,
+      "name": "MacBooks",
+      "slug": "macbooks"
+    },
+    {
+      "id": 8,
+      "category_id": 3,
+      "name": "Gaming Laptops",
+      "slug": "gaming-laptops"
+    },
+    {
+      "id": 9,
+      "category_id": 3,
+      "name": "Ultrabooks",
+      "slug": "ultrabooks"
+    },
+    {
+      "id": 10,
+      "category_id": 4,
+      "name": "Apple Watch",
+      "slug": "apple-watch"
+    },
+    {
+      "id": 11,
+      "category_id": 4,
+      "name": "Fitness Trackers",
+      "slug": "fitness-trackers"
+    },
+    {
+      "id": 1789039975466,
+      "category_id": 1789039975465,
+      "name": "Indoor Cameras",
+      "slug": "indoor-cameras"
+    },
+    {
+      "id": 1789039975467,
+      "category_id": 1789039975465,
+      "name": "Outdoor Wireless",
+      "slug": "outdoor-wireless"
+    },
+    {
+      "id": 1789040102300,
+      "category_id": 1789040102299,
+      "name": "Electronic flits",
+      "slug": "electronic-flits"
+    },
+    {
+      "id": 1789040102301,
+      "category_id": 1789040102299,
+      "name": "Normal flit",
+      "slug": "normal-flit"
+    },
+    {
+      "id": 1789040421568,
+      "category_id": 1789040421567,
+      "name": "PlayStation",
+      "slug": "playstation"
+    },
+    {
+      "id": 1789040421569,
+      "category_id": 1789040421567,
+      "name": "Xbox",
+      "slug": "xbox"
+    },
+    {
+      "id": 1789040421570,
+      "category_id": 1789040421567,
+      "name": "Nintendo Switch",
+      "slug": "nintendo-switch"
     }
   ]
 }

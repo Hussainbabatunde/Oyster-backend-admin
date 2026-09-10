@@ -9,39 +9,56 @@ generator client {
 }
 
 model Category {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique @db.VarChar(100)
-  slug        String    @db.VarChar(100)
-  description String?   @db.Text
-  createdAt   DateTime  @default(now()) @map("created_at")
+  id          Int           @id @default(autoincrement())
+  name        String        @unique @db.VarChar(100)
+  slug        String        @db.VarChar(100)
+  description String?       @db.Text
+  createdAt   DateTime      @default(now()) @map("created_at")
 
-  products    Product[]
+  subcategories SubCategory[]
+  products      Product[]
 
   @@map("categories")
 }
 
-model Product {
-  id             Int       @id @default(autoincrement())
-  name           String    @db.VarChar(255)
-  nickname       String?   @db.VarChar(255)
-  categoryId     Int?      @map("category_id")
-  categoryName   String?   @map("category_name") @db.VarChar(100)
-  price          Decimal   @db.Decimal(10, 2)
-  originalPrice  Decimal?  @map("original_price") @db.Decimal(10, 2)
-  description    String?   @db.Text
-  size           String?   @db.VarChar(255)
-  color          String?   @db.VarChar(255)
-  inStock        Boolean   @default(true) @map("in_stock")
-  stockCount     Int       @default(10) @map("stock_count")
-  rating         Decimal   @default(5.0) @db.Decimal(3, 2)
-  reviewsCount   Int       @default(1) @map("reviews_count")
-  image          String?   @db.Text
-  images         Json?     @default("[]")
-  specifications Json?     @default("[]")
-  certificateNumber String @default("") @map("certificate_number") @db.VarChar(255)
-  createdAt      DateTime  @default(now()) @map("created_at")
+model SubCategory {
+  id          Int       @id @default(autoincrement())
+  categoryId  Int       @map("category_id")
+  name        String    @db.VarChar(100)
+  slug        String    @db.VarChar(100)
+  createdAt   DateTime  @default(now()) @map("created_at")
 
-  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products    Product[]
+
+  @@map("sub_categories")
+}
+
+model Product {
+  id                Int          @id @default(autoincrement())
+  name              String       @db.VarChar(255)
+  nickname          String?      @db.VarChar(255)
+  categoryId        Int?         @map("category_id")
+  categoryName      String?      @map("category_name") @db.VarChar(100)
+  subcategoryId     Int?         @map("subcategory_id")
+  subcategoryName   String?      @map("subcategory_name") @db.VarChar(100)
+  price             Decimal      @db.Decimal(10, 2)
+  originalPrice     Decimal?     @map("original_price") @db.Decimal(10, 2)
+  description       String?      @db.Text
+  size              String?      @db.VarChar(255)
+  color             String?      @db.VarChar(255)
+  inStock           Boolean      @default(true) @map("in_stock")
+  stockCount        Int          @default(10) @map("stock_count")
+  rating            Decimal      @default(5.0) @db.Decimal(3, 2)
+  reviewsCount      Int          @default(1) @map("reviews_count")
+  image             String?      @db.Text
+  images            Json?        @default("[]")
+  specifications    Json?        @default("[]")
+  certificateNumber String       @default("") @map("certificate_number") @db.VarChar(255)
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  category    Category?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  subcategory SubCategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
 
   @@map("products")
 }

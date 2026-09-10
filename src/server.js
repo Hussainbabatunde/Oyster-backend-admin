@@ -155,51 +155,131 @@ app.post('/api/auth/reset-password', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// CATEGORIES ROUTES
+// -------------------------------------------------------------
+// CATEGORIES & SUB-CATEGORIES ROUTES
 // -------------------------------------------------------------
 
-// Get All Categories
-app.get('/api/categories', async (req, res) => {
+// Get All Categories (with attached sub-categories array)
+app.get("/api/categories", async (req, res) => {
   try {
     if (isPgActive()) {
-      const { rows } = await pool.query('SELECT * FROM categories ORDER BY id ASC');
-      return res.json({ success: true, categories: rows });
+      const { rows: categories } = await pool.query("SELECT * FROM categories ORDER BY id ASC");
+      const { rows: subcategories } = await pool.query("SELECT * FROM sub_categories ORDER BY id ASC");
+      
+      const result = categories.map(cat => ({
+        ...cat,
+        subcategories: subcategories.filter(sub => sub.category_id === cat.id)
+      }));
+      return res.json({ success: true, categories: result });
     } else {
       const data = loadLocalData();
-      return res.json({ success: true, categories: data.categories || [] });
+      const subs = data.sub_categories || [];
+      const result = (data.categories || []).map(cat => ({
+        ...cat,
+        subcategories: subs.filter(sub => String(sub.category_id) === String(cat.id))
+      }));
+      return res.json({ success: true, categories: result });
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// Create Category
-app.post('/api/categories', async (req, res) => {
-  const { name, description } = req.body;
+// Get Subcategories (optionally filtered by category_id)
+app.get("/api/subcategories", async (req, res) => {
+  const categoryId = req.query.category_id ? parseInt(req.query.category_id) : null;
+  try {
+    if (isPgActive()) {
+      let query = "SELECT * FROM sub_categories ORDER BY id ASC";
+      let params = [];
+      if (categoryId) {
+        query = "SELECT * FROM sub_categories WHERE category_id = $1 ORDER BY id ASC";
+        params = [categoryId];
+      }
+      const { rows } = await pool.query(query, params);
+      return res.json({ success: true, subcategories: rows });
+    } else {
+      const data = loadLocalData();
+      let subs = data.sub_categories || [];
+      if (categoryId) {
+        subs = subs.filter(s => String(s.category_id) === String(categoryId));
+      }
+      return res.json({ success: true, subcategories: subs });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Create Category (with optional attached subcategories)
+app.post("/api/categories", async (req, res) => {
+  const { name, description, subcategories } = req.body;
   if (!name) {
-    return res.status(400).json({ success: false, message: 'Category name is required' });
+    return res.status(400).json({ success: false, message: "Category name is required" });
   }
 
-  const slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+  const slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+  const subList = Array.isArray(subcategories) ? subcategories : [];
 
   try {
     if (isPgActive()) {
       const { rows } = await pool.query(
-        'INSERT INTO categories (name, slug, description) VALUES ($1, $2, $3) RETURNING *',
-        [name, slug, description || '']
+        "INSERT INTO categories (name, slug, description) VALUES ($1, $2, $3) RETURNING *",
+        [name, slug, description || ""]
       );
-      return res.status(201).json({ success: true, category: rows[0] });
+      const category = rows[0];
+
+      const createdSubs = [];
+      for (const subItem of subList) {
+        const subName = typeof subItem === "string" ? subItem : subItem.name;
+        if (subName && subName.trim()) {
+          const subSlug = subName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+          const subRes = await pool.query(
+            "INSERT INTO sub_categories (category_id, name, slug) VALUES ($1, $2, $3) RETURNING *",
+            [category.id, subName.trim(), subSlug]
+          );
+          createdSubs.push(subRes.rows[0]);
+        }
+      }
+
+      return res.status(201).json({
+        success: true,
+        category: { ...category, subcategories: createdSubs }
+      });
     } else {
       const data = loadLocalData();
-      const newCategory = {
+      if (!data.sub_categories) data.sub_categories = [];
+
+      const category = {
         id: Date.now(),
         name,
         slug,
-        description: description || ''
+        description: description || ""
       };
-      data.categories.push(newCategory);
+      data.categories.push(category);
+
+      const createdSubs = [];
+      let subIdCounter = Date.now() + 1;
+      for (const subItem of subList) {
+        const subName = typeof subItem === "string" ? subItem : subItem.name;
+        if (subName && subName.trim()) {
+          const subSlug = subName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+          const newSub = {
+            id: subIdCounter++,
+            category_id: category.id,
+            name: subName.trim(),
+            slug: subSlug
+          };
+          data.sub_categories.push(newSub);
+          createdSubs.push(newSub);
+        }
+      }
+
       saveLocalData(data);
-      return res.status(201).json({ success: true, category: newCategory });
+      return res.status(201).json({
+        success: true,
+        category: { ...category, subcategories: createdSubs }
+      });
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -207,30 +287,66 @@ app.post('/api/categories', async (req, res) => {
 });
 
 // Update Category
-app.put('/api/categories/:id', async (req, res) => {
+app.put("/api/categories/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-  const { name, description } = req.body;
-
-  const slug = name ? name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-') : '';
+  const { name, description, subcategories } = req.body;
+  const slug = name ? name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-") : "";
 
   try {
     if (isPgActive()) {
       const { rows } = await pool.query(
-        'UPDATE categories SET name = COALESCE($1, name), slug = COALESCE($2, slug), description = COALESCE($3, description) WHERE id = $4 RETURNING *',
-        [name, slug, description, id]
+        "UPDATE categories SET name = COALESCE($1, name), slug = COALESCE($2, slug), description = COALESCE($3, description) WHERE id = $4 RETURNING *",
+        [name || null, slug || null, description !== undefined ? description : null, id]
       );
-      return res.json({ success: true, category: rows[0] });
+      if (rows.length === 0) return res.status(404).json({ success: false, message: "Category not found" });
+      const category = rows[0];
+
+      if (Array.isArray(subcategories)) {
+        await pool.query("DELETE FROM sub_categories WHERE category_id = $1", [id]);
+        for (const subItem of subcategories) {
+          const subName = typeof subItem === "string" ? subItem : subItem.name;
+          if (subName && subName.trim()) {
+            const subSlug = subName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+            await pool.query(
+              "INSERT INTO sub_categories (category_id, name, slug) VALUES ($1, $2, $3)",
+              [id, subName.trim(), subSlug]
+            );
+          }
+        }
+      }
+
+      const { rows: updatedSubs } = await pool.query("SELECT * FROM sub_categories WHERE category_id = $1", [id]);
+      return res.json({ success: true, category: { ...category, subcategories: updatedSubs } });
     } else {
       const data = loadLocalData();
+      if (!data.sub_categories) data.sub_categories = [];
       const index = data.categories.findIndex(c => c.id === id);
-      if (index === -1) return res.status(404).json({ success: false, message: 'Category not found' });
+      if (index === -1) return res.status(404).json({ success: false, message: "Category not found" });
 
       if (name) data.categories[index].name = name;
       if (slug) data.categories[index].slug = slug;
       if (description !== undefined) data.categories[index].description = description;
 
+      if (Array.isArray(subcategories)) {
+        data.sub_categories = data.sub_categories.filter(s => s.category_id !== id);
+        let subIdCounter = Date.now();
+        for (const subItem of subcategories) {
+          const subName = typeof subItem === "string" ? subItem : subItem.name;
+          if (subName && subName.trim()) {
+            const subSlug = subName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+            data.sub_categories.push({
+              id: subIdCounter++,
+              category_id: id,
+              name: subName.trim(),
+              slug: subSlug
+            });
+          }
+        }
+      }
+
       saveLocalData(data);
-      return res.json({ success: true, category: data.categories[index] });
+      const updatedSubs = data.sub_categories.filter(s => s.category_id === id);
+      return res.json({ success: true, category: { ...data.categories[index], subcategories: updatedSubs } });
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -238,23 +354,80 @@ app.put('/api/categories/:id', async (req, res) => {
 });
 
 // Delete Category
-app.delete('/api/categories/:id', async (req, res) => {
+app.delete("/api/categories/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-
   try {
     if (isPgActive()) {
-      await pool.query('DELETE FROM categories WHERE id = $1', [id]);
-      return res.json({ success: true, message: 'Category deleted' });
+      await pool.query("DELETE FROM categories WHERE id = $1", [id]);
+      return res.json({ success: true, message: "Category deleted" });
     } else {
       const data = loadLocalData();
       data.categories = data.categories.filter(c => c.id !== id);
+      if (data.sub_categories) {
+        data.sub_categories = data.sub_categories.filter(s => s.category_id !== id);
+      }
       saveLocalData(data);
-      return res.json({ success: true, message: 'Category deleted' });
+      return res.json({ success: true, message: "Category deleted" });
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+// Create Standalone Subcategory
+app.post("/api/subcategories", async (req, res) => {
+  const { category_id, name } = req.body;
+  if (!category_id || !name) {
+    return res.status(400).json({ success: false, message: "category_id and name are required" });
+  }
+  const catId = parseInt(category_id);
+  const slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+
+  try {
+    if (isPgActive()) {
+      const { rows } = await pool.query(
+        "INSERT INTO sub_categories (category_id, name, slug) VALUES ($1, $2, $3) RETURNING *",
+        [catId, name.trim(), slug]
+      );
+      return res.status(201).json({ success: true, subcategory: rows[0] });
+    } else {
+      const data = loadLocalData();
+      if (!data.sub_categories) data.sub_categories = [];
+      const newSub = {
+        id: Date.now(),
+        category_id: catId,
+        name: name.trim(),
+        slug
+      };
+      data.sub_categories.push(newSub);
+      saveLocalData(data);
+      return res.status(201).json({ success: true, subcategory: newSub });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Delete Subcategory
+app.delete("/api/subcategories/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    if (isPgActive()) {
+      await pool.query("DELETE FROM sub_categories WHERE id = $1", [id]);
+      return res.json({ success: true, message: "Sub-category deleted" });
+    } else {
+      const data = loadLocalData();
+      if (data.sub_categories) {
+        data.sub_categories = data.sub_categories.filter(s => s.id !== id);
+      }
+      saveLocalData(data);
+      return res.json({ success: true, message: "Sub-category deleted" });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 
 // -------------------------------------------------------------
 // PRODUCTS ROUTES
@@ -333,6 +506,8 @@ app.post('/api/products', async (req, res) => {
     nickname,
     category_id,
     category_name,
+    subcategory_id,
+    subcategory_name,
     price,
     original_price,
     description,
@@ -362,14 +537,16 @@ app.post('/api/products', async (req, res) => {
     if (isPgActive()) {
       const { rows } = await pool.query(
         `INSERT INTO products 
-        (name, nickname, category_id, category_name, price, original_price, description, size, color, in_stock, stock_count, rating, image, images, specifications) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) 
+        (name, nickname, category_id, category_name, subcategory_id, subcategory_name, price, original_price, description, size, color, in_stock, stock_count, rating, image, images, specifications) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) 
         RETURNING *`,
         [
           name,
           nickname || '',
           category_id || null,
           category_name || 'General',
+          subcategory_id || null,
+          subcategory_name || '',
           parsedPrice,
           parsedOrigPrice,
           description || '',
@@ -392,6 +569,8 @@ app.post('/api/products', async (req, res) => {
         nickname: nickname || '',
         category_id: category_id || null,
         category_name: category_name || 'General',
+        subcategory_id: subcategory_id || null,
+        subcategory_name: subcategory_name || '',
         price: parsedPrice,
         original_price: parsedOrigPrice,
         description: description || '',
@@ -444,23 +623,27 @@ app.put('/api/products/:id', async (req, res) => {
           nickname = COALESCE($2, nickname),
           category_id = COALESCE($3, category_id),
           category_name = COALESCE($4, category_name),
-          price = COALESCE($5, price),
-          original_price = COALESCE($6, original_price),
-          description = COALESCE($7, description),
-          size = COALESCE($8, size),
-          color = COALESCE($9, color),
-          in_stock = COALESCE($10, in_stock),
-          stock_count = COALESCE($11, stock_count),
-          rating = COALESCE($12, rating),
-          image = COALESCE($13, image),
-          images = COALESCE($14, images),
-          specifications = COALESCE($15, specifications)
-        WHERE id = $16 RETURNING *`,
+          subcategory_id = COALESCE($5, subcategory_id),
+          subcategory_name = COALESCE($6, subcategory_name),
+          price = COALESCE($7, price),
+          original_price = COALESCE($8, original_price),
+          description = COALESCE($9, description),
+          size = COALESCE($10, size),
+          color = COALESCE($11, color),
+          in_stock = COALESCE($12, in_stock),
+          stock_count = COALESCE($13, stock_count),
+          rating = COALESCE($14, rating),
+          image = COALESCE($15, image),
+          images = COALESCE($16, images),
+          specifications = COALESCE($17, specifications)
+        WHERE id = $18 RETURNING *`,
         [
           name,
           nickname,
           category_id,
           category_name,
+          subcategory_id,
+          subcategory_name,
           price ? parseFloat(price) : null,
           original_price ? parseFloat(original_price) : null,
           description,
@@ -488,6 +671,8 @@ app.put('/api/products/:id', async (req, res) => {
         nickname: nickname !== undefined ? nickname : existing.nickname,
         category_id: category_id !== undefined ? category_id : existing.category_id,
         category_name: category_name !== undefined ? category_name : existing.category_name,
+        subcategory_id: subcategory_id !== undefined ? subcategory_id : existing.subcategory_id,
+        subcategory_name: subcategory_name !== undefined ? subcategory_name : existing.subcategory_name,
         price: price !== undefined ? parseFloat(price) : existing.price,
         original_price: original_price !== undefined ? parseFloat(original_price) : existing.original_price,
         description: description !== undefined ? description : existing.description,

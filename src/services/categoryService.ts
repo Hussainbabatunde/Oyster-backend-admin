@@ -1,22 +1,63 @@
 import { prisma } from '../config/prisma';
 import { CategoryPayload } from '../types';
 
+function parseSubcategoriesInput(input?: any): Array<{ name: string; slug: string }> {
+  if (!input) return [];
+  let items: any[] = [];
+  if (typeof input === 'string') {
+    items = input.split(',').map(s => s.trim()).filter(Boolean);
+  } else if (Array.isArray(input)) {
+    items = input;
+  }
+  return items.map(item => {
+    let name = typeof item === 'string' ? item : (item?.name || '');
+    name = name.trim();
+    const slug = typeof item === 'object' && item?.slug ? item.slug : name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return { name, slug };
+  }).filter(sub => sub.name.length > 0);
+}
+
 export class CategoryService {
   static async getAllCategories() {
-    return prisma.category.findMany({
+    const categories = await prisma.category.findMany({
+      include: {
+        subcategories: {
+          orderBy: { id: 'asc' },
+        },
+      },
       orderBy: { id: 'asc' },
     });
+
+    return categories.map(cat => ({
+      ...cat,
+      sub_categories: cat.subcategories,
+    }));
   }
 
   static async createCategory(payload: CategoryPayload) {
     const slug = payload.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
-    return prisma.category.create({
+    const subcats = parseSubcategoriesInput(payload.subcategories || payload.sub_categories);
+
+    const category = await prisma.category.create({
       data: {
         name: payload.name,
         slug,
         description: payload.description || '',
+        subcategories: subcats.length > 0 ? {
+          create: subcats,
+        } : undefined,
+      },
+      include: {
+        subcategories: {
+          orderBy: { id: 'asc' },
+        },
       },
     });
+
+    return {
+      ...category,
+      sub_categories: category.subcategories,
+    };
   }
 
   static async updateCategory(id: number, payload: Partial<CategoryPayload>) {
@@ -29,10 +70,30 @@ export class CategoryService {
       data.description = payload.description;
     }
 
-    return prisma.category.update({
+    const subcatsInput = payload.subcategories || payload.sub_categories;
+    if (subcatsInput !== undefined) {
+      const subcats = parseSubcategoriesInput(subcatsInput);
+      if (subcats.length > 0) {
+        data.subcategories = {
+          create: subcats,
+        };
+      }
+    }
+
+    const category = await prisma.category.update({
       where: { id },
       data,
+      include: {
+        subcategories: {
+          orderBy: { id: 'asc' },
+        },
+      },
     });
+
+    return {
+      ...category,
+      sub_categories: category.subcategories,
+    };
   }
 
   static async deleteCategory(id: number) {
@@ -40,4 +101,24 @@ export class CategoryService {
       where: { id },
     });
   }
+
+  static async addSubcategory(categoryId: number, name: string) {
+    const trimmed = name.trim();
+    const slug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    return prisma.subCategory.create({
+      data: {
+        categoryId,
+        name: trimmed,
+        slug,
+      },
+    });
+  }
+
+  static async deleteSubcategory(subcategoryId: number) {
+    return prisma.subCategory.delete({
+      where: { id: subcategoryId },
+    });
+  }
 }
+

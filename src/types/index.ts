@@ -10,6 +10,8 @@ export interface AuthRequest extends Request {
 export interface CategoryPayload {
   name: string;
   description?: string;
+  subcategories?: string[] | Array<{ name: string; slug?: string }> | string;
+  sub_categories?: string[] | Array<{ name: string; slug?: string }> | string;
 }
 
 export interface ProductPayload {

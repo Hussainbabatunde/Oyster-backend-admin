@@ -3,20 +3,36 @@ import { ProductPayload } from '../types';
 import { Prisma } from '@prisma/client';
 
 export class ProductService {
-  static async getAllProducts(category?: string, search?: string) {
+  static async getAllProducts(categoryId?: string, subcategoryId?: string, search?: string) {
     const andConditions: Prisma.ProductWhereInput[] = [];
 
-    if (category) {
-      const catId = parseInt(category);
-      if (!isNaN(catId)) {
+    if (categoryId && categoryId.toLowerCase() !== 'all') {
+      const parsedCatId = parseInt(categoryId);
+      if (!isNaN(parsedCatId)) {
+        andConditions.push({ categoryId: parsedCatId });
+      } else {
         andConditions.push({
           OR: [
-            { categoryId: catId },
-            { categoryName: { equals: category, mode: 'insensitive' } },
-          ],
+            { categoryName: { equals: categoryId, mode: 'insensitive' } },
+            { category: { slug: { equals: categoryId, mode: 'insensitive' } } },
+            { category: { name: { equals: categoryId, mode: 'insensitive' } } }
+          ]
         });
+      }
+    }
+
+    if (subcategoryId && subcategoryId.toLowerCase() !== 'all') {
+      const parsedSubId = parseInt(subcategoryId);
+      if (!isNaN(parsedSubId)) {
+        andConditions.push({ subcategoryId: parsedSubId });
       } else {
-        andConditions.push({ categoryName: { equals: category, mode: 'insensitive' } });
+        andConditions.push({
+          OR: [
+            { subcategoryName: { equals: subcategoryId, mode: 'insensitive' } },
+            { subcategory: { slug: { equals: subcategoryId, mode: 'insensitive' } } },
+            { subcategory: { name: { equals: subcategoryId, mode: 'insensitive' } } }
+          ]
+        });
       }
     }
 
@@ -36,12 +52,20 @@ export class ProductService {
     return prisma.product.findMany({
       where,
       orderBy: { id: 'desc' },
+      include: {
+        category: true,
+        subcategory: true
+      }
     });
   }
 
   static async getProductById(id: number) {
     return prisma.product.findUnique({
       where: { id },
+      include: {
+        category: true,
+        subcategory: true
+      }
     });
   }
 
@@ -60,6 +84,8 @@ export class ProductService {
         nickname: payload.nickname || '',
         category: payload.category_id ? { connect: { id: payload.category_id } } : undefined,
         categoryName: payload.category_name || 'General',
+        subcategory: payload.subcategory_id ? { connect: { id: payload.subcategory_id } } : undefined,
+        subcategoryName: payload.subcategory_name || '',
         price: new Prisma.Decimal(parsedPrice),
         originalPrice: new Prisma.Decimal(parsedOrigPrice),
         description: payload.description || '',
@@ -83,6 +109,8 @@ export class ProductService {
     if (payload.nickname !== undefined) data.nickname = payload.nickname;
     if (payload.category_id !== undefined) data.category = payload.category_id ? { connect: { id: payload.category_id } } : { disconnect: true };
     if (payload.category_name !== undefined) data.categoryName = payload.category_name;
+    if (payload.subcategory_id !== undefined) data.subcategory = payload.subcategory_id ? { connect: { id: payload.subcategory_id } } : { disconnect: true };
+    if (payload.subcategory_name !== undefined) data.subcategoryName = payload.subcategory_name;
     if (payload.price !== undefined) data.price = new Prisma.Decimal(payload.price);
     if (payload.original_price !== undefined) data.originalPrice = new Prisma.Decimal(payload.original_price);
     if (payload.description !== undefined) data.description = payload.description;

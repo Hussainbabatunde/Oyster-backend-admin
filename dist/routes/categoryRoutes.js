@@ -5,6 +5,8 @@ const categoryController_1 = require("../controllers/categoryController");
 const router = (0, express_1.Router)();
 router.get('/', categoryController_1.CategoryController.getAll);
 router.post('/', categoryController_1.CategoryController.create);
+router.post('/:id/subcategories', categoryController_1.CategoryController.addSubcategory);
+router.delete('/subcategories/:subId', categoryController_1.CategoryController.deleteSubcategory);
 router.put('/:id', categoryController_1.CategoryController.update);
 router.delete('/:id', categoryController_1.CategoryController.delete);
 exports.default = router;

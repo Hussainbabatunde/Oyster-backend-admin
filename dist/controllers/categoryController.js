@@ -14,11 +14,15 @@ class CategoryController {
     }
     static async create(req, res, next) {
         try {
-            const { name, description } = req.body;
+            const { name, description, subcategories, sub_categories } = req.body;
             if (!name) {
                 return res.status(400).json({ success: false, message: 'Category name is required' });
             }
-            const category = await categoryService_1.CategoryService.createCategory({ name, description });
+            const category = await categoryService_1.CategoryService.createCategory({
+                name,
+                description,
+                subcategories: subcategories || sub_categories,
+            });
             return res.status(201).json({ success: true, category });
         }
         catch (err) {
@@ -44,6 +48,34 @@ class CategoryController {
                 return res.status(400).json({ success: false, message: 'Invalid category ID' });
             await categoryService_1.CategoryService.deleteCategory(id);
             return res.json({ success: true, message: 'Category deleted' });
+        }
+        catch (err) {
+            next(err);
+        }
+    }
+    static async addSubcategory(req, res, next) {
+        try {
+            const id = parseInt(req.params.id);
+            const { name } = req.body;
+            if (isNaN(id))
+                return res.status(400).json({ success: false, message: 'Invalid category ID' });
+            if (!name || !String(name).trim()) {
+                return res.status(400).json({ success: false, message: 'Subcategory name is required' });
+            }
+            const subcategory = await categoryService_1.CategoryService.addSubcategory(id, String(name).trim());
+            return res.status(201).json({ success: true, subcategory });
+        }
+        catch (err) {
+            next(err);
+        }
+    }
+    static async deleteSubcategory(req, res, next) {
+        try {
+            const subId = parseInt(req.params.subId);
+            if (isNaN(subId))
+                return res.status(400).json({ success: false, message: 'Invalid subcategory ID' });
+            await categoryService_1.CategoryService.deleteSubcategory(subId);
+            return res.json({ success: true, message: 'Subcategory deleted' });
         }
         catch (err) {
             next(err);

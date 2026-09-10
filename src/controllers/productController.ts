@@ -4,8 +4,30 @@ import { ProductService } from '../services/productService';
 export class ProductController {
   static async getAll(req: Request, res: Response, next: NextFunction) {
     try {
-      const { category, search } = req.query as { category?: string; search?: string };
-      const products = await ProductService.getAllProducts(category, search);
+      const {
+        categoryId,
+        category_id,
+        category,
+        subcategoryId,
+        subCategoryId,
+        sub_category_id,
+        subcategory,
+        search
+      } = req.query as {
+        categoryId?: string;
+        category_id?: string;
+        category?: string;
+        subcategoryId?: string;
+        subCategoryId?: string;
+        sub_category_id?: string;
+        subcategory?: string;
+        search?: string;
+      };
+
+      const finalCat = categoryId || category_id || category;
+      const finalSub = subcategoryId || subCategoryId || sub_category_id || subcategory;
+
+      const products = await ProductService.getAllProducts(finalCat, finalSub, search);
       return res.json({ success: true, products });
     } catch (err: any) {
       next(err);
