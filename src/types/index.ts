@@ -18,7 +18,13 @@ export interface ProductPayload {
   name: string;
   nickname?: string;
   category_id?: number;
+  categoryId?: number;
   category_name?: string;
+  categoryName?: string;
+  subcategory_id?: number;
+  subcategoryId?: number;
+  subcategory_name?: string;
+  subcategoryName?: string;
   price: number;
   original_price?: number;
   description?: string;

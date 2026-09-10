@@ -5,8 +5,10 @@ const productService_1 = require("../services/productService");
 class ProductController {
     static async getAll(req, res, next) {
         try {
-            const { category, search } = req.query;
-            const products = await productService_1.ProductService.getAllProducts(category, search);
+            const { categoryId, category_id, category, subcategoryId, subCategoryId, sub_category_id, subcategory, search } = req.query;
+            const finalCat = categoryId || category_id || category;
+            const finalSub = subcategoryId || subCategoryId || sub_category_id || subcategory;
+            const products = await productService_1.ProductService.getAllProducts(finalCat, finalSub, search);
             return res.json({ success: true, products });
         }
         catch (err) {

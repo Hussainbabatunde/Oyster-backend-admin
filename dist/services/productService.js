@@ -4,20 +4,46 @@ exports.ProductService = void 0;
 const prisma_1 = require("../config/prisma");
 const client_1 = require("@prisma/client");
 class ProductService {
-    static async getAllProducts(category, search) {
+    static async getAllProducts(categoryId, subcategoryId, search) {
         const andConditions = [];
-        if (category) {
-            const catId = parseInt(category);
-            if (!isNaN(catId)) {
+        if (categoryId && categoryId.toLowerCase() !== 'all') {
+            const parsedCatId = parseInt(categoryId);
+            if (!isNaN(parsedCatId)) {
                 andConditions.push({
                     OR: [
-                        { categoryId: catId },
-                        { categoryName: { equals: category, mode: 'insensitive' } },
-                    ],
+                        { categoryId: parsedCatId },
+                        { category: { id: parsedCatId } }
+                    ]
                 });
             }
             else {
-                andConditions.push({ categoryName: { equals: category, mode: 'insensitive' } });
+                andConditions.push({
+                    OR: [
+                        { categoryName: { equals: categoryId, mode: 'insensitive' } },
+                        { category: { slug: { equals: categoryId, mode: 'insensitive' } } },
+                        { category: { name: { equals: categoryId, mode: 'insensitive' } } }
+                    ]
+                });
+            }
+        }
+        if (subcategoryId && subcategoryId.toLowerCase() !== 'all') {
+            const parsedSubId = parseInt(subcategoryId);
+            if (!isNaN(parsedSubId)) {
+                andConditions.push({
+                    OR: [
+                        { subcategoryId: parsedSubId },
+                        { subcategory: { id: parsedSubId } }
+                    ]
+                });
+            }
+            else {
+                andConditions.push({
+                    OR: [
+                        { subcategoryName: { equals: subcategoryId, mode: 'insensitive' } },
+                        { subcategory: { slug: { equals: subcategoryId, mode: 'insensitive' } } },
+                        { subcategory: { name: { equals: subcategoryId, mode: 'insensitive' } } }
+                    ]
+                });
             }
         }
         if (search && search.trim()) {
@@ -34,11 +60,19 @@ class ProductService {
         return prisma_1.prisma.product.findMany({
             where,
             orderBy: { id: 'desc' },
+            include: {
+                category: true,
+                subcategory: true
+            }
         });
     }
     static async getProductById(id) {
         return prisma_1.prisma.product.findUnique({
             where: { id },
+            include: {
+                category: true,
+                subcategory: true
+            }
         });
     }
     static async createProduct(payload) {
@@ -49,12 +83,28 @@ class ProductService {
         const parsedStockCount = payload.stock_count ?? 10;
         const specs = payload.specifications ?? [];
         const imgList = (payload.images && payload.images.length) ? payload.images : [payload.image || '/images/product-item1.jpg'];
+        const catId = payload.category_id || payload.categoryId;
+        const subId = payload.subcategory_id || payload.subcategoryId;
+        let catName = payload.category_name || payload.categoryName || '';
+        let subName = payload.subcategory_name || payload.subcategoryName || '';
+        if (catId && !catName) {
+            const c = await prisma_1.prisma.category.findUnique({ where: { id: catId } });
+            if (c)
+                catName = c.name;
+        }
+        if (subId && !subName) {
+            const s = await prisma_1.prisma.subCategory.findUnique({ where: { id: subId } });
+            if (s)
+                subName = s.name;
+        }
         return prisma_1.prisma.product.create({
             data: {
                 name: payload.name,
                 nickname: payload.nickname || '',
-                category: payload.category_id ? { connect: { id: payload.category_id } } : undefined,
-                categoryName: payload.category_name || 'General',
+                categoryId: catId || undefined,
+                categoryName: catName || 'General',
+                subcategoryId: subId || undefined,
+                subcategoryName: subName || '',
                 price: new client_1.Prisma.Decimal(parsedPrice),
                 originalPrice: new client_1.Prisma.Decimal(parsedOrigPrice),
                 description: payload.description || '',
@@ -80,6 +130,10 @@ class ProductService {
             data.category = payload.category_id ? { connect: { id: payload.category_id } } : { disconnect: true };
         if (payload.category_name !== undefined)
             data.categoryName = payload.category_name;
+        if (payload.subcategory_id !== undefined)
+            data.subcategory = payload.subcategory_id ? { connect: { id: payload.subcategory_id } } : { disconnect: true };
+        if (payload.subcategory_name !== undefined)
+            data.subcategoryName = payload.subcategory_name;
         if (payload.price !== undefined)
             data.price = new client_1.Prisma.Decimal(payload.price);
         if (payload.original_price !== undefined)

@@ -19,18 +19,33 @@ function parseSubcategoriesInput(input?: any): Array<{ name: string; slug: strin
 
 export class CategoryService {
   static async getAllCategories() {
-    const categories = await prisma.category.findMany({
-      include: {
-        subcategories: {
-          orderBy: { id: 'asc' },
+    let categories: any[];
+    try {
+      categories = await prisma.category.findMany({
+        include: {
+          subcategories: {
+            orderBy: { id: 'asc' },
+          },
         },
-      },
-      orderBy: { id: 'asc' },
-    });
+        orderBy: { id: 'asc' },
+      });
+    } catch (err: any) {
+      console.warn('Prisma subcategories include error, using fallback:', err.message);
+      const rawCats = await prisma.category.findMany({ orderBy: { id: 'asc' } });
+      let allSubs: any[] = [];
+      try {
+        allSubs = await prisma.subCategory.findMany({ orderBy: { id: 'asc' } });
+      } catch (e) {}
+
+      categories = rawCats.map(cat => {
+        const subcategories = allSubs.filter(sub => sub.categoryId === cat.id);
+        return { ...cat, subcategories };
+      });
+    }
 
     return categories.map(cat => ({
       ...cat,
-      sub_categories: cat.subcategories,
+      sub_categories: cat.subcategories || [],
     }));
   }
 

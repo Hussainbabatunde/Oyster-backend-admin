@@ -21,17 +21,33 @@ function parseSubcategoriesInput(input) {
 }
 class CategoryService {
     static async getAllCategories() {
-        const categories = await prisma_1.prisma.category.findMany({
-            include: {
-                subcategories: {
-                    orderBy: { id: 'asc' },
+        let categories;
+        try {
+            categories = await prisma_1.prisma.category.findMany({
+                include: {
+                    subcategories: {
+                        orderBy: { id: 'asc' },
+                    },
                 },
-            },
-            orderBy: { id: 'asc' },
-        });
+                orderBy: { id: 'asc' },
+            });
+        }
+        catch (err) {
+            console.warn('Prisma subcategories include error, using fallback:', err.message);
+            const rawCats = await prisma_1.prisma.category.findMany({ orderBy: { id: 'asc' } });
+            let allSubs = [];
+            try {
+                allSubs = await prisma_1.prisma.subCategory.findMany({ orderBy: { id: 'asc' } });
+            }
+            catch (e) { }
+            categories = rawCats.map(cat => {
+                const subcategories = allSubs.filter(sub => sub.categoryId === cat.id);
+                return { ...cat, subcategories };
+            });
+        }
         return categories.map(cat => ({
             ...cat,
-            sub_categories: cat.subcategories,
+            sub_categories: cat.subcategories || [],
         }));
     }
     static async createCategory(payload) {
