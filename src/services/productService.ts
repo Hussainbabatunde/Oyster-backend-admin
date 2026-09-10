@@ -9,7 +9,12 @@ export class ProductService {
     if (categoryId && categoryId.toLowerCase() !== 'all') {
       const parsedCatId = parseInt(categoryId);
       if (!isNaN(parsedCatId)) {
-        andConditions.push({ categoryId: parsedCatId });
+        andConditions.push({
+          OR: [
+            { categoryId: parsedCatId },
+            { category: { id: parsedCatId } }
+          ]
+        });
       } else {
         andConditions.push({
           OR: [
@@ -24,7 +29,12 @@ export class ProductService {
     if (subcategoryId && subcategoryId.toLowerCase() !== 'all') {
       const parsedSubId = parseInt(subcategoryId);
       if (!isNaN(parsedSubId)) {
-        andConditions.push({ subcategoryId: parsedSubId });
+        andConditions.push({
+          OR: [
+            { subcategoryId: parsedSubId },
+            { subcategory: { id: parsedSubId } }
+          ]
+        });
       } else {
         andConditions.push({
           OR: [
@@ -78,14 +88,29 @@ export class ProductService {
     const specs = payload.specifications ?? [];
     const imgList = (payload.images && payload.images.length) ? payload.images : [payload.image || '/images/product-item1.jpg'];
 
+    const catId = payload.category_id || (payload as any).categoryId;
+    const subId = payload.subcategory_id || (payload as any).subcategoryId;
+
+    let catName = payload.category_name || (payload as any).categoryName || '';
+    let subName = payload.subcategory_name || (payload as any).subcategoryName || '';
+
+    if (catId && !catName) {
+      const c = await prisma.category.findUnique({ where: { id: catId } });
+      if (c) catName = c.name;
+    }
+    if (subId && !subName) {
+      const s = await prisma.subCategory.findUnique({ where: { id: subId } });
+      if (s) subName = s.name;
+    }
+
     return prisma.product.create({
       data: {
         name: payload.name,
         nickname: payload.nickname || '',
-        category: payload.category_id ? { connect: { id: payload.category_id } } : undefined,
-        categoryName: payload.category_name || 'General',
-        subcategory: payload.subcategory_id ? { connect: { id: payload.subcategory_id } } : undefined,
-        subcategoryName: payload.subcategory_name || '',
+        categoryId: catId || undefined,
+        categoryName: catName || 'General',
+        subcategoryId: subId || undefined,
+        subcategoryName: subName || '',
         price: new Prisma.Decimal(parsedPrice),
         originalPrice: new Prisma.Decimal(parsedOrigPrice),
         description: payload.description || '',
