@@ -1,72 +1,212 @@
 {
   "categories": [
     {
-      "id": 1,
+      "id": 9,
       "name": "Phone",
       "slug": "phone",
-      "description": "Smartphones & Mobile Devices"
+      "description": "Phones category"
     },
     {
-      "id": 2,
-      "name": "Power Bank",
-      "slug": "power-bank",
-      "description": "Portable Power & Chargers"
+      "id": 10,
+      "name": "Car Accessories",
+      "slug": "car-accessories",
+      "description": "Different car accessories"
     },
     {
-      "id": 3,
+      "id": 11,
+      "name": "Smartwork devices",
+      "slug": "smartwork-devices",
+      "description": ""
+    },
+    {
+      "id": 12,
+      "name": "Healthcare",
+      "slug": "healthcare",
+      "description": ""
+    },
+    {
+      "id": 13,
+      "name": "Computers",
+      "slug": "computers",
+      "description": ""
+    }
+  ],
+  "sub_categories": [
+    {
+      "id": 20,
+      "category_id": 9,
+      "name": "New",
+      "slug": "new"
+    },
+    {
+      "id": 21,
+      "category_id": 9,
+      "name": "Preowned",
+      "slug": "preowned"
+    },
+    {
+      "id": 22,
+      "category_id": 10,
+      "name": "Battery maintainer",
+      "slug": "battery-maintainer"
+    },
+    {
+      "id": 23,
+      "category_id": 10,
+      "name": "Android screens",
+      "slug": "android-screens"
+    },
+    {
+      "id": 24,
+      "category_id": 11,
+      "name": "Smart Desks & Stands",
+      "slug": "smart-desks-stands"
+    },
+    {
+      "id": 25,
+      "category_id": 11,
+      "name": "Smart Displays & Docks",
+      "slug": "smart-displays-docks"
+    },
+    {
+      "id": 26,
+      "category_id": 12,
+      "name": "Health Monitors",
+      "slug": "health-monitors"
+    },
+    {
+      "id": 27,
+      "category_id": 12,
+      "name": "Fitness & Pulse Trackers",
+      "slug": "fitness-pulse-trackers"
+    },
+    {
+      "id": 28,
+      "category_id": 13,
       "name": "Laptops",
-      "slug": "laptops",
-      "description": "High-Performance Laptops & Notebooks"
+      "slug": "laptops"
     },
     {
-      "id": 1789039975465,
-      "name": "Smart Cameras",
-      "slug": "smart-cameras",
-      "description": "Security Cameras"
-    },
-    {
-      "id": 1789040102299,
-      "name": "Flit",
-      "slug": "flit",
-      "description": "a flit category"
-    },
-    {
-      "id": 1789040421567,
-      "name": "Gaming Consoles",
-      "slug": "gaming-consoles",
-      "description": "Next-gen gaming systems and controllers"
+      "id": 29,
+      "category_id": 13,
+      "name": "Desktops & Workstations",
+      "slug": "desktops-workstations"
     }
   ],
   "products": [
     {
-      "id": 1789039315279,
-      "name": "PlayStation 5 Slim",
-      "nickname": "",
-      "category_id": 1789039312178,
-      "category_name": "Gaming Consoles",
-      "subcategory_id": null,
-      "subcategory_name": "PlayStation",
-      "price": 499.99,
-      "original_price": 499.99,
-      "description": "",
-      "size": "",
-      "color": "",
+      "id": 23,
+      "name": "NOCO Genius1 6V/12V Automatic Smart Battery Maintainer",
+      "nickname": "Smart Battery Charger",
+      "category_id": 10,
+      "category_name": "Car Accessories",
+      "subcategory_id": 22,
+      "subcategory_name": "Battery maintainer",
+      "price": 49.99,
+      "original_price": 59.99,
+      "description": "Fully-automatic 1-Amp smart charger, battery maintainer, trickle charger, and battery desulfator for 6V and 12V lead-acid & lithium batteries.",
+      "size": "Compact",
+      "color": "Black/Red",
       "in_stock": true,
-      "stock_count": 10,
-      "rating": 5,
-      "reviews_count": 1,
-      "image": "/images/product-item1.jpg",
+      "stock_count": 30,
+      "rating": 4.9,
+      "reviews_count": 75,
+      "image": "http://localhost:5001/uploads/car_battery_maintainer.jpg",
       "images": [
-        "/images/product-item1.jpg"
+        "http://localhost:5001/uploads/car_battery_maintainer.jpg"
       ],
-      "specifications": []
+      "specifications": [
+        {
+          "title": "Voltage",
+          "description": "6V & 12V Smart Voltage Detection"
+        },
+        {
+          "title": "Current Output",
+          "description": "1.0 Amp Fast Maintainer"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/car_battery_maintainer.jpg"
+      ]
     },
     {
-      "id": 1,
-      "name": "iPhone 15 Pro Max",
+      "id": 24,
+      "name": "Anker Roav Smart Car Battery Voltage Monitor",
+      "nickname": "Battery Telemetry & Fast Charger",
+      "category_id": 10,
+      "category_name": "Car Accessories",
+      "subcategory_id": 22,
+      "subcategory_name": "Battery maintainer",
+      "price": 29.99,
+      "original_price": 39.99,
+      "description": "Real-time car battery health tracking via Bluetooth app, dual Quick Charge 3.0 USB ports, and car parking locator.",
+      "size": "Standard Plug",
+      "color": "Black",
+      "in_stock": true,
+      "stock_count": 40,
+      "rating": 4.8,
+      "reviews_count": 52,
+      "image": "http://localhost:5001/uploads/car_voltage_monitor.jpg",
+      "images": [
+        "http://localhost:5001/uploads/car_voltage_monitor.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Monitoring",
+          "description": "App-based Realtime Battery Telemetry"
+        },
+        {
+          "title": "Ports",
+          "description": "Dual QC 3.0 USB Fast Charge"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/car_voltage_monitor.jpg"
+      ]
+    },
+    {
+      "id": 25,
+      "name": "10.25-inch HD Touchscreen Android Screen Head Unit",
+      "nickname": "Smart Car Display",
+      "category_id": 10,
+      "category_name": "Car Accessories",
+      "subcategory_id": 23,
+      "subcategory_name": "Android screens",
+      "price": 299,
+      "original_price": 349,
+      "description": "Universal 10.25-inch Wireless Apple CarPlay & Android Auto multimedia touchscreen receiver with GPS, DSP audio, and Bluetooth 5.0.",
+      "size": "10.25 inch",
+      "color": "Black",
+      "in_stock": true,
+      "stock_count": 18,
+      "rating": 4.9,
+      "reviews_count": 61,
+      "image": "http://localhost:5001/uploads/android_car_screen.jpg",
+      "images": [
+        "http://localhost:5001/uploads/android_car_screen.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Screen Size",
+          "description": "10.25-inch 1920x720 HD IPS"
+        },
+        {
+          "title": "Connectivity",
+          "description": "Wireless CarPlay & Android Auto"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/android_car_screen.jpg"
+      ]
+    },
+    {
+      "id": 18,
+      "name": "iPhone 15 Pro Max 256GB",
       "nickname": "Titanium Beast",
-      "category_id": 1,
+      "category_id": 9,
       "category_name": "Phone",
+      "subcategory_id": 20,
+      "subcategory_name": "New",
       "price": 1199,
       "original_price": 1299,
       "description": "Forged in titanium with the ground-breaking A17 Pro chip, customizable Action button, and the most powerful iPhone camera system ever.",
@@ -76,9 +216,9 @@
       "stock_count": 45,
       "rating": 4.9,
       "reviews_count": 128,
-      "image": "/images/hero-phone.png",
+      "image": "http://localhost:5001/uploads/hero-phone.png",
       "images": [
-        "/images/hero-phone.png"
+        "http://localhost:5001/uploads/hero-phone.png"
       ],
       "specifications": [
         {
@@ -86,215 +226,411 @@
           "description": "Apple A17 Pro Bionic chip"
         },
         {
-          "title": "Camera",
-          "description": "48MP Main | 12MP Ultra Wide | 12MP 5x Telephoto"
+          "title": "Display",
+          "description": "6.7-inch Super Retina XDR with ProMotion 120Hz"
         },
         {
-          "title": "Battery",
-          "description": "Up to 29 hours video playback"
+          "title": "Camera",
+          "description": "48MP Main | 12MP Ultra Wide | 12MP 5x Telephoto"
         }
       ],
-      "subcategory_id": 1,
-      "subcategory_name": "iPhones"
+      "gallery": [
+        "http://localhost:5001/uploads/hero-phone.png"
+      ]
     },
     {
-      "id": 2,
-      "name": "Anker PowerCore 24K Power Bank",
-      "nickname": "Ultra Charger",
-      "category_id": 2,
-      "category_name": "Power Bank",
-      "price": 149,
-      "original_price": 179,
-      "description": "Ultra-powerful 24,000mAh power bank with 140W fast output and smart digital display screen for real-time telemetry.",
-      "size": "24,000 mAh",
-      "color": "Midnight Black",
+      "id": 19,
+      "name": "Samsung Galaxy S24 Ultra 5G",
+      "nickname": "AI Flagship",
+      "category_id": 9,
+      "category_name": "Phone",
+      "subcategory_id": 20,
+      "subcategory_name": "New",
+      "price": 1299,
+      "original_price": 1399,
+      "description": "Unleash new ways to create, connect and accomplish with Galaxy AI, built-in S-Pen, and 200MP camera system.",
+      "size": "256GB, 512GB",
+      "color": "Titanium Black, Titanium Gray",
       "in_stock": true,
-      "stock_count": 30,
-      "rating": 4.8,
-      "reviews_count": 85,
-      "image": "/images/product-item2.jpg",
+      "stock_count": 20,
+      "rating": 4.9,
+      "reviews_count": 94,
+      "image": "http://localhost:5001/uploads/product-item2.jpg",
       "images": [
-        "/images/product-item2.jpg"
+        "http://localhost:5001/uploads/product-item2.jpg"
       ],
       "specifications": [
         {
-          "title": "Capacity",
-          "description": "24,000mAh / 86.4Wh"
+          "title": "Processor",
+          "description": "Snapdragon 8 Gen 3 for Galaxy"
         },
         {
-          "title": "Max Output",
-          "description": "140W Power Delivery 3.1"
+          "title": "Camera",
+          "description": "200MP Main + 50MP Periscope Telephoto"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/product-item2.jpg"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Preowned iPhone 14 Pro Max 256GB - Grade A",
+      "nickname": "Refurbished Flagship",
+      "category_id": 9,
+      "category_name": "Phone",
+      "subcategory_id": 21,
+      "subcategory_name": "Preowned",
+      "price": 799,
+      "original_price": 1099,
+      "description": "Certified preowned iPhone 14 Pro Max in pristine condition. Includes Dynamic Island, 48MP camera, 92%+ battery capacity.",
+      "size": "256GB",
+      "color": "Space Black",
+      "in_stock": true,
+      "stock_count": 15,
+      "rating": 4.8,
+      "reviews_count": 56,
+      "image": "http://localhost:5001/uploads/product-item4.jpg",
+      "images": [
+        "http://localhost:5001/uploads/product-item4.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Condition",
+          "description": "Grade A Certified Preowned"
         },
         {
-          "title": "Ports",
-          "description": "2x USB-C, 1x USB-A"
+          "title": "Battery Health",
+          "description": "92% or higher guaranteed"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/product-item4.jpg"
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Preowned iPhone 13 128GB - Midnight",
+      "nickname": "Certified Refurbished",
+      "category_id": 9,
+      "category_name": "Phone",
+      "subcategory_id": 21,
+      "subcategory_name": "Preowned",
+      "price": 499,
+      "original_price": 699,
+      "description": "Factory tested preowned iPhone 13 featuring Super Retina XDR display, A15 Bionic, dual 12MP camera, and 90%+ battery health.",
+      "size": "128GB",
+      "color": "Midnight",
+      "in_stock": true,
+      "stock_count": 25,
+      "rating": 4.7,
+      "reviews_count": 42,
+      "image": "http://localhost:5001/uploads/product-item3.jpg",
+      "images": [
+        "http://localhost:5001/uploads/product-item3.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Condition",
+          "description": "Grade A Refurbished"
+        },
+        {
+          "title": "Chipset",
+          "description": "Apple A15 Bionic"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/product-item3.jpg"
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Preowned Samsung Galaxy S22 Ultra 5G",
+      "nickname": "Refurbished Note",
+      "category_id": 9,
+      "category_name": "Phone",
+      "subcategory_id": 21,
+      "subcategory_name": "Preowned",
+      "price": 549,
+      "original_price": 899,
+      "description": "Preowned Galaxy S22 Ultra with built-in S-Pen, 108MP camera system, 120Hz AMOLED display, fully tested & sanitized.",
+      "size": "256GB",
+      "color": "Phantom Black",
+      "in_stock": true,
+      "stock_count": 10,
+      "rating": 4.6,
+      "reviews_count": 38,
+      "image": "http://localhost:5001/uploads/product-item5.jpg",
+      "images": [
+        "http://localhost:5001/uploads/product-item5.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Condition",
+          "description": "Grade A Preowned"
+        },
+        {
+          "title": "Accessories",
+          "description": "S-Pen included"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/product-item5.jpg"
+      ]
+    },
+    {
+      "id": 26,
+      "name": "9-inch Ultra Slim Android 13 Car Stereo Screen",
+      "nickname": "Octa-Core Car Multimedia",
+      "category_id": 10,
+      "category_name": "Car Accessories",
+      "subcategory_id": 23,
+      "subcategory_name": "Android screens",
+      "price": 199,
+      "original_price": 249,
+      "description": "Octa-core 4GB RAM + 64GB ROM Android car multimedia touchscreen with AHD night-vision backup camera input and split-screen mode.",
+      "size": "9 inch",
+      "color": "Black",
+      "in_stock": true,
+      "stock_count": 22,
+      "rating": 4.7,
+      "reviews_count": 45,
+      "image": "http://localhost:5001/uploads/car_stereo_screen.jpg",
+      "images": [
+        "http://localhost:5001/uploads/car_stereo_screen.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "OS",
+          "description": "Android 13.0 with 4GB RAM + 64GB ROM"
+        },
+        {
+          "title": "Camera Input",
+          "description": "AHD 1080p Night Vision Camera Support"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/car_stereo_screen.jpg"
+      ]
+    },
+    {
+      "id": 27,
+      "name": "Dual-Motor Electric Standing Desk 55x28",
+      "nickname": "Ergonomic Smart Desk",
+      "category_id": 11,
+      "category_name": "Smartwork devices",
+      "subcategory_id": 24,
+      "subcategory_name": "Smart Desks & Stands",
+      "price": 399,
+      "original_price": 459,
+      "description": "Ergonomic motorized height adjustable desk with 4 memory height presets, built-in USB charging ports, and cable management channel.",
+      "size": "55x28 inch",
+      "color": "Walnut Top / Black Frame",
+      "in_stock": true,
+      "stock_count": 14,
+      "rating": 4.9,
+      "reviews_count": 33,
+      "image": "http://localhost:5001/uploads/standing_desk.jpg",
+      "images": [
+        "http://localhost:5001/uploads/standing_desk.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Motors",
+          "description": "Dual Quiet Electric Motors (220 lbs capacity)"
+        },
+        {
+          "title": "Memory Presets",
+          "description": "4 Programmable Height Presets"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/standing_desk.jpg"
+      ]
+    },
+    {
+      "id": 28,
+      "name": "Anker 13-in-1 Thunderbolt 4 Smart Docking Station",
+      "nickname": "Pro Workstation Hub",
+      "category_id": 11,
+      "category_name": "Smartwork devices",
+      "subcategory_id": 25,
+      "subcategory_name": "Smart Displays & Docks",
+      "price": 249.99,
+      "original_price": 299.99,
+      "description": "Triple display output support, 85W laptop pass-through charging, 40Gbps Thunderbolt ports, Gigabit Ethernet, and SD card slot.",
+      "size": "Desktop Hub",
+      "color": "Space Gray",
+      "in_stock": true,
+      "stock_count": 25,
+      "rating": 4.8,
+      "reviews_count": 29,
+      "image": "http://localhost:5001/uploads/docking_station.jpg",
+      "images": [
+        "http://localhost:5001/uploads/docking_station.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Speed",
+          "description": "Up to 40Gbps Thunderbolt 4"
+        },
+        {
+          "title": "Power Output",
+          "description": "85W Upstream Laptop Charging"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/docking_station.jpg"
+      ]
+    },
+    {
+      "id": 29,
+      "name": "Omron Evolv Wireless Upper Arm Blood Pressure Monitor",
+      "nickname": "Smart BP Monitor",
+      "category_id": 12,
+      "category_name": "Healthcare",
+      "subcategory_id": 26,
+      "subcategory_name": "Health Monitors",
+      "price": 99.99,
+      "original_price": 119.99,
+      "description": "Wireless upper arm blood pressure monitor with compact one-piece design and Bluetooth sync to smartphone health app.",
+      "size": "Standard Cuff (9-17 in)",
+      "color": "Black/White",
+      "in_stock": true,
+      "stock_count": 30,
+      "rating": 4.9,
+      "reviews_count": 58,
+      "image": "http://localhost:5001/uploads/blood_pressure_monitor.jpg",
+      "images": [
+        "http://localhost:5001/uploads/blood_pressure_monitor.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Connectivity",
+          "description": "Bluetooth Smart Sync"
+        },
+        {
+          "title": "Validation",
+          "description": "FDA Cleared Clinical Accuracy"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/blood_pressure_monitor.jpg"
+      ]
+    },
+    {
+      "id": 30,
+      "name": "Smart Fingertip Pulse Oximeter & ECG Monitor",
+      "nickname": "Biometric Tracker",
+      "category_id": 12,
+      "category_name": "Healthcare",
+      "subcategory_id": 27,
+      "subcategory_name": "Fitness & Pulse Trackers",
+      "price": 49,
+      "original_price": 65,
+      "description": "Accurate SpO2 blood oxygen saturation and pulse rate monitor with OLED display, Bluetooth logs, and continuous tracking.",
+      "size": "Portable Fingertip",
+      "color": "White/Blue",
+      "in_stock": true,
+      "stock_count": 40,
+      "rating": 4.7,
+      "reviews_count": 41,
+      "image": "http://localhost:5001/uploads/pulse_oximeter.jpg",
+      "images": [
+        "http://localhost:5001/uploads/pulse_oximeter.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Metrics",
+          "description": "SpO2 %, Pulse Rate, Perfusion Index"
         },
         {
           "title": "Display",
-          "description": "Smart Color LCD Screen"
+          "description": "Multi-directional Dual-Color OLED"
         }
       ],
-      "subcategory_id": 1,
-      "subcategory_name": "Fast Charging"
+      "gallery": [
+        "http://localhost:5001/uploads/pulse_oximeter.jpg"
+      ]
     },
     {
-      "id": 3,
+      "id": 32,
+      "name": "Apple Mac Studio M2 Ultra",
+      "nickname": "Ultimate Desktop",
+      "category_id": 13,
+      "category_name": "Computers",
+      "subcategory_id": 29,
+      "subcategory_name": "Desktops & Workstations",
+      "price": 3999,
+      "original_price": 4299,
+      "description": "Extreme performance workstation with 24-core CPU, 60-core GPU, 64GB unified memory, 1TB SSD, and compact silent thermal system.",
+      "size": "64GB / 1TB SSD",
+      "color": "Silver",
+      "in_stock": true,
+      "stock_count": 8,
+      "rating": 4.9,
+      "reviews_count": 22,
+      "image": "http://localhost:5001/uploads/mac_studio.jpg",
+      "images": [
+        "http://localhost:5001/uploads/mac_studio.jpg"
+      ],
+      "specifications": [
+        {
+          "title": "Processor",
+          "description": "Apple M2 Ultra (24-Core CPU, 60-Core GPU)"
+        },
+        {
+          "title": "Memory",
+          "description": "64GB Unified Memory"
+        }
+      ],
+      "gallery": [
+        "http://localhost:5001/uploads/mac_studio.jpg"
+      ]
+    },
+    {
+      "id": 31,
       "name": "MacBook Pro 16 M3 Max",
       "nickname": "Creator Workstation",
-      "category_id": 3,
-      "category_name": "Laptops",
+      "category_id": 13,
+      "category_name": "Computers",
+      "subcategory_id": 28,
+      "subcategory_name": "Laptops",
       "price": 2499,
       "original_price": 2699,
-      "description": "Supercharged by the M3 Max chip with 16-core CPU and 40-core GPU, Liquid Retina XDR display, and up to 22 hours battery life.",
-      "size": "36GB RAM / 1TB SSD",
-      "color": "Space Black, Silver",
+      "description": "Supercharged by the M3 Max chip with 16-core CPU and 40-core GPU, 36GB unified memory, Liquid Retina XDR display, and up to 22 hrs battery.",
+      "size": "16-inch / 36GB RAM / 1TB SSD",
+      "color": "Space Black",
       "in_stock": true,
       "stock_count": 12,
       "rating": 5,
       "reviews_count": 64,
-      "image": "/images/single-image1.png",
+      "image": "http://localhost:5001/uploads/single-image1.png",
       "images": [
-        "/images/single-image1.png"
+        "http://localhost:5001/uploads/single-image1.png"
       ],
       "specifications": [
         {
-          "title": "Chipset",
+          "title": "Processor",
           "description": "Apple M3 Max (16-Core CPU, 40-Core GPU)"
         },
         {
-          "title": "Memory",
-          "description": "36GB Unified Memory"
-        },
-        {
-          "title": "Storage",
-          "description": "1TB Superfast NVMe SSD"
-        },
-        {
-          "title": "Screen",
+          "title": "Display",
           "description": "16.2-inch Liquid Retina XDR (3456 x 2234)"
         }
       ],
-      "subcategory_id": 1,
-      "subcategory_name": "MacBooks"
+      "gallery": [
+        "http://localhost:5001/uploads/single-image1.png"
+      ]
     }
   ],
   "admin_users": [
     {
       "id": 1,
       "email": "admin@oyster.com",
-      "password_hash": "$2a$10$wT8f6sFm.W69eD9O.M4NneCqZcQk4B3uL1r9x7g7h8i9j0k1l2m3n",
+      "password_hash": "a.W69eD9O.M4NneCqZcQk4B3uL1r9x7g7h8i9j0k1l2m3n",
       "reset_token": null,
       "reset_token_expires": null
-    }
-  ],
-  "sub_categories": [
-    {
-      "id": 1,
-      "category_id": 1,
-      "name": "iPhones",
-      "slug": "iphones"
-    },
-    {
-      "id": 2,
-      "category_id": 1,
-      "name": "Android Phones",
-      "slug": "android-phones"
-    },
-    {
-      "id": 3,
-      "category_id": 1,
-      "name": "Refurbished",
-      "slug": "refurbished"
-    },
-    {
-      "id": 4,
-      "category_id": 2,
-      "name": "Fast Charging",
-      "slug": "fast-charging"
-    },
-    {
-      "id": 5,
-      "category_id": 2,
-      "name": "MagSafe & Wireless",
-      "slug": "magsafe-wireless"
-    },
-    {
-      "id": 6,
-      "category_id": 2,
-      "name": "High Capacity",
-      "slug": "high-capacity"
-    },
-    {
-      "id": 7,
-      "category_id": 3,
-      "name": "MacBooks",
-      "slug": "macbooks"
-    },
-    {
-      "id": 8,
-      "category_id": 3,
-      "name": "Gaming Laptops",
-      "slug": "gaming-laptops"
-    },
-    {
-      "id": 9,
-      "category_id": 3,
-      "name": "Ultrabooks",
-      "slug": "ultrabooks"
-    },
-    {
-      "id": 10,
-      "category_id": 4,
-      "name": "Apple Watch",
-      "slug": "apple-watch"
-    },
-    {
-      "id": 11,
-      "category_id": 4,
-      "name": "Fitness Trackers",
-      "slug": "fitness-trackers"
-    },
-    {
-      "id": 1789039975466,
-      "category_id": 1789039975465,
-      "name": "Indoor Cameras",
-      "slug": "indoor-cameras"
-    },
-    {
-      "id": 1789039975467,
-      "category_id": 1789039975465,
-      "name": "Outdoor Wireless",
-      "slug": "outdoor-wireless"
-    },
-    {
-      "id": 1789040102300,
-      "category_id": 1789040102299,
-      "name": "Electronic flits",
-      "slug": "electronic-flits"
-    },
-    {
-      "id": 1789040102301,
-      "category_id": 1789040102299,
-      "name": "Normal flit",
-      "slug": "normal-flit"
-    },
-    {
-      "id": 1789040421568,
-      "category_id": 1789040421567,
-      "name": "PlayStation",
-      "slug": "playstation"
-    },
-    {
-      "id": 1789040421569,
-      "category_id": 1789040421567,
-      "name": "Xbox",
-      "slug": "xbox"
-    },
-    {
-      "id": 1789040421570,
-      "category_id": 1789040421567,
-      "name": "Nintendo Switch",
-      "slug": "nintendo-switch"
     }
   ]
 }
