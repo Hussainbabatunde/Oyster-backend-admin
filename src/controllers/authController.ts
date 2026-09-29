@@ -23,14 +23,28 @@ export class AuthController {
         return res.status(400).json({ success: false, message: 'Email is required' });
       }
 
-      const { resetToken } = await AuthService.requestPasswordReset(email);
+      // Extract origin header or referer for dynamic reset link construction
+      let origin = req.headers.origin as string;
+      if (!origin && req.headers.referer) {
+        try {
+          const urlObj = new URL(req.headers.referer);
+          origin = urlObj.origin;
+        } catch (e) {
+          // ignore parsing error
+        }
+      }
+
+      const { resetToken, resetLink, emailSent, previewUrl } = await AuthService.requestPasswordReset(email, origin);
       return res.json({
         success: true,
-        message: `Password reset token sent to ${email}`,
+        message: `Password reset verification email sent to ${email}`,
+        resetLink,
         demoResetToken: resetToken,
+        emailSent,
+        ...(previewUrl ? { previewUrl } : {}),
       });
     } catch (err: any) {
-      next(err);
+      return res.status(400).json({ success: false, message: err.message || 'Failed to process password reset request' });
     }
   }
 
