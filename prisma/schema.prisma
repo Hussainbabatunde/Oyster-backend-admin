@@ -67,8 +67,11 @@ model AdminUser {
   id                Int       @id @default(autoincrement())
   email             String    @unique @db.VarChar(255)
   passwordHash      String    @map("password_hash") @db.Text
+  name              String?   @db.VarChar(255)
+  role              String    @default("SUPER_ADMIN") @db.VarChar(50)
   resetToken        String?   @map("reset_token") @db.VarChar(255)
   resetTokenExpires DateTime? @map("reset_token_expires")
+  createdAt         DateTime  @default(now()) @map("created_at")
 
   @@map("admin_users")
 }

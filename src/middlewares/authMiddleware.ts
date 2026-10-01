@@ -12,11 +12,37 @@ export function authenticateToken(req: AuthRequest, res: Response, next: NextFun
     return res.status(401).json({ success: false, message: 'Authentication required' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(403).json({ success: false, message: 'Invalid or expired token' });
     }
-    req.user = user as { id: number; email: string };
+    req.user = decoded as { id: number; email: string; name?: string; role?: string };
     next();
   });
+}
+
+export function requireSuperAdmin(req: AuthRequest, res: Response, next: NextFunction) {
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: 'Authentication required' });
+  }
+
+  if (req.user.role !== 'SUPER_ADMIN') {
+    return res.status(403).json({ success: false, message: 'Access denied: Only Super Admin can perform this action' });
+  }
+
+  next();
+}
+
+export function requireRole(...allowedRoles: string[]) {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Authentication required' });
+    }
+
+    if (!req.user.role || !allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: `Access denied: Requires one of [${allowedRoles.join(', ')}] role` });
+    }
+
+    next();
+  };
 }
