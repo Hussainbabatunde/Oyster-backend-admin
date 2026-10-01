@@ -12,10 +12,14 @@ export class AuthService {
     if (!cleanEmail || !data.password) {
       throw new Error('Email and password are required');
     }
+    console.log("user created_______", cleanEmail);
+
 
     const existingUser = await prisma.adminUser.findUnique({
       where: { email: cleanEmail },
     });
+    console.log("existing user___________", existingUser);
+
     if (existingUser) {
       throw new Error('An account with this email address already exists');
     }
@@ -24,8 +28,11 @@ export class AuthService {
     const superAdminExists = await prisma.adminUser.findFirst({
       where: { role: 'SUPER_ADMIN' },
     });
+    console.log("super admin exists___________", superAdminExists);
+
 
     const expectedSecret = process.env.SUPER_ADMIN_SECRET || 'oyster_super_admin_secret_2026';
+
     if (superAdminExists && data.secretKey !== expectedSecret) {
       throw new Error('A Super Admin account already exists on this platform. Additional users (Admin/Sales) must be created by an logged-in Super Admin.');
     }
@@ -39,6 +46,8 @@ export class AuthService {
         role: 'SUPER_ADMIN',
       },
     });
+    console.log("user created successfully___________", user);
+
 
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name, role: user.role },
@@ -172,7 +181,7 @@ export class AuthService {
 
   static async requestPasswordReset(email: string, origin?: string) {
     const cleanEmail = email.trim().toLowerCase();
-    
+
     // Generate secure 32-byte (64 char) random token
     const resetToken = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 3600000); // 1 hour expiration

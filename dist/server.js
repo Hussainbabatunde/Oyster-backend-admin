@@ -20,6 +20,8 @@ const timezone = 'Africa/Lagos';
 process.env.TZ = timezone;
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5001;
+// Enable trust proxy for express-rate-limit behind reverse proxies (Nginx, Cloudflare, etc.)
+app.set('trust proxy', 1);
 // Rate Limiter Configuration
 const limiter = (0, express_rate_limit_1.default)({
     windowMs: 1 * 60 * 1000, // 1 minute

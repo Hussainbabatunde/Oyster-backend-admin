@@ -21,30 +21,14 @@ function parseSubcategoriesInput(input) {
 }
 class CategoryService {
     static async getAllCategories() {
-        let categories;
-        try {
-            categories = await prisma_1.prisma.category.findMany({
-                include: {
-                    subcategories: {
-                        orderBy: { id: 'asc' },
-                    },
+        const categories = await prisma_1.prisma.category.findMany({
+            include: {
+                subcategories: {
+                    orderBy: { id: 'asc' },
                 },
-                orderBy: { id: 'asc' },
-            });
-        }
-        catch (err) {
-            console.warn('Prisma subcategories include error, using fallback:', err.message);
-            const rawCats = await prisma_1.prisma.category.findMany({ orderBy: { id: 'asc' } });
-            let allSubs = [];
-            try {
-                allSubs = await prisma_1.prisma.subCategory.findMany({ orderBy: { id: 'asc' } });
-            }
-            catch (e) { }
-            categories = rawCats.map(cat => {
-                const subcategories = allSubs.filter(sub => sub.categoryId === cat.id);
-                return { ...cat, subcategories };
-            });
-        }
+            },
+            orderBy: { id: 'asc' },
+        });
         return categories.map(cat => ({
             ...cat,
             sub_categories: cat.subcategories || [],
@@ -106,14 +90,14 @@ class CategoryService {
         };
     }
     static async deleteCategory(id) {
-        return prisma_1.prisma.category.delete({
+        return await prisma_1.prisma.category.delete({
             where: { id },
         });
     }
     static async addSubcategory(categoryId, name) {
         const trimmed = name.trim();
         const slug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        return prisma_1.prisma.subCategory.create({
+        return await prisma_1.prisma.subCategory.create({
             data: {
                 categoryId,
                 name: trimmed,
@@ -122,7 +106,7 @@ class CategoryService {
         });
     }
     static async deleteSubcategory(subcategoryId) {
-        return prisma_1.prisma.subCategory.delete({
+        return await prisma_1.prisma.subCategory.delete({
             where: { id: subcategoryId },
         });
     }

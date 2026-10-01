@@ -7,6 +7,7 @@ const router = Router();
 // Public Authentication
 router.post('/login', AuthController.login);
 router.post('/signup', AuthController.signupSuperAdmin);
+router.post('/register', AuthController.signupSuperAdmin);
 router.post('/signup-super-admin', AuthController.signupSuperAdmin);
 router.post('/forgot-password', AuthController.forgotPassword);
 router.post('/reset-password', AuthController.resetPassword);

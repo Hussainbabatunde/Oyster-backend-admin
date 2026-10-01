@@ -57,7 +57,7 @@ class ProductService {
             });
         }
         const where = andConditions.length > 0 ? { AND: andConditions } : {};
-        return prisma_1.prisma.product.findMany({
+        return await prisma_1.prisma.product.findMany({
             where,
             orderBy: { id: 'desc' },
             include: {
@@ -67,7 +67,7 @@ class ProductService {
         });
     }
     static async getProductById(id) {
-        return prisma_1.prisma.product.findUnique({
+        return await prisma_1.prisma.product.findUnique({
             where: { id },
             include: {
                 category: true,
@@ -97,7 +97,7 @@ class ProductService {
             if (s)
                 subName = s.name;
         }
-        return prisma_1.prisma.product.create({
+        return await prisma_1.prisma.product.create({
             data: {
                 name: payload.name,
                 nickname: payload.nickname || '',
@@ -161,13 +161,13 @@ class ProductService {
         const certNo = payload.certificate_number ?? payload.certificateNumber;
         if (certNo !== undefined)
             data.certificateNumber = certNo;
-        return prisma_1.prisma.product.update({
+        return await prisma_1.prisma.product.update({
             where: { id },
             data,
         });
     }
     static async deleteProduct(id) {
-        return prisma_1.prisma.product.delete({
+        return await prisma_1.prisma.product.delete({
             where: { id },
         });
     }
@@ -176,7 +176,7 @@ class ProductService {
         if (!existing)
             throw new Error('Product not found');
         const newReviewsCount = existing.reviewsCount + 1;
-        return prisma_1.prisma.product.update({
+        return await prisma_1.prisma.product.update({
             where: { id },
             data: {
                 rating: new client_1.Prisma.Decimal(rating),

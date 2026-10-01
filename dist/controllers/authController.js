@@ -3,6 +3,55 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const authService_1 = require("../services/authService");
 class AuthController {
+    static async signupSuperAdmin(req, res, next) {
+        try {
+            const { name, email, password, secretKey } = req.body;
+            if (!email || !password) {
+                return res.status(400).json({ success: false, message: 'Email and password are required' });
+            }
+            const result = await authService_1.AuthService.signupSuperAdmin({ name, email, password, secretKey });
+            return res.status(201).json({ success: true, message: 'Super Admin registered successfully', ...result });
+        }
+        catch (err) {
+            return res.status(400).json({ success: false, message: err.message || 'Signup failed' });
+        }
+    }
+    static async createUser(req, res, next) {
+        try {
+            const { name, email, password, role } = req.body;
+            if (!email || !password) {
+                return res.status(400).json({ success: false, message: 'Email and password are required' });
+            }
+            const user = await authService_1.AuthService.createUser({ name, email, password, role });
+            return res.status(201).json({ success: true, message: `${user.role} user created successfully`, user });
+        }
+        catch (err) {
+            return res.status(400).json({ success: false, message: err.message || 'User creation failed' });
+        }
+    }
+    static async getUsers(req, res, next) {
+        try {
+            const users = await authService_1.AuthService.getAllUsers();
+            return res.json({ success: true, users });
+        }
+        catch (err) {
+            return res.status(500).json({ success: false, message: err.message || 'Failed to fetch users' });
+        }
+    }
+    static async deleteUser(req, res, next) {
+        try {
+            const id = parseInt(req.params.id);
+            if (isNaN(id)) {
+                return res.status(400).json({ success: false, message: 'Invalid user ID' });
+            }
+            const currentUserId = req.user?.id || 0;
+            await authService_1.AuthService.deleteUser(id, currentUserId);
+            return res.json({ success: true, message: 'User deleted successfully' });
+        }
+        catch (err) {
+            return res.status(400).json({ success: false, message: err.message || 'Delete user failed' });
+        }
+    }
     static async login(req, res, next) {
         try {
             const { email, password } = req.body;
@@ -22,15 +71,28 @@ class AuthController {
             if (!email) {
                 return res.status(400).json({ success: false, message: 'Email is required' });
             }
-            const { resetToken } = await authService_1.AuthService.requestPasswordReset(email);
+            let origin = req.headers.origin;
+            if (!origin && req.headers.referer) {
+                try {
+                    const urlObj = new URL(req.headers.referer);
+                    origin = urlObj.origin;
+                }
+                catch (e) {
+                    // ignore parsing error
+                }
+            }
+            const { resetToken, resetLink, emailSent, previewUrl } = await authService_1.AuthService.requestPasswordReset(email, origin);
             return res.json({
                 success: true,
-                message: `Password reset token sent to ${email}`,
+                message: `Password reset verification email sent to ${email}`,
+                resetLink,
                 demoResetToken: resetToken,
+                emailSent,
+                ...(previewUrl ? { previewUrl } : {}),
             });
         }
         catch (err) {
-            next(err);
+            return res.status(400).json({ success: false, message: err.message || 'Failed to process password reset request' });
         }
     }
     static async resetPassword(req, res, next) {
