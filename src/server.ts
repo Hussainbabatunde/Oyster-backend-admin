@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 
 import authRoutes from './routes/authRoutes';
 import customerAuthRoutes from './routes/customerAuthRoutes';
+import customerRoutes from './routes/customerRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import productRoutes from './routes/productRoutes';
 import healthRoutes from './routes/healthRoutes';
@@ -50,6 +51,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/customer', customerAuthRoutes);
+app.use('/api/customers', customerRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/upload', uploadRoutes);
