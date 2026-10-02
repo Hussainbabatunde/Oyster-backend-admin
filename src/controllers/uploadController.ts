@@ -21,7 +21,6 @@ export class UploadController {
         });
       }
 
-
       const imageUrls: string[] = [];
       let uploadProvider = "AWS S3";
 
