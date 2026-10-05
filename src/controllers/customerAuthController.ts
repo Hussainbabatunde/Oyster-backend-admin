@@ -26,6 +26,7 @@ export class CustomerAuthController {
     }
   }
 
+
   static async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
